@@ -12,6 +12,8 @@ const Success = () => {
       alert("Missing session_id (Stripe issue)");
       return;
     }
+    console.log("SESSION VALUE:", sessionId);
+
 
     const generate = async () => {
       const res = await fetch(
