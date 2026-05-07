@@ -40,57 +40,29 @@ const Novel = () => {
     }
   };
 
-  const generateStory = async () => {
-    console.log("CLICKED");
-    setLoading(true);
-    try {
-      const res = await fetch("https://novel-backend-1-93dx.onrender.com/generate-pdf", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          idea: idea,
-          tone: "dark psychological",
-          character: "Elena",
-          setting: "apartment",
-          length: "medium"
-        })
-      });
-      console.log("STATUS:", res.status);
-      if (!res.ok) {
-        const text = await res.text();
-        console.error("BACKEND ERROR:", text);
-        alert("Backend error: " + text);
-        return;
-      }
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "story.pdf";
-      a.click();
-    } catch (err) {
-      console.error("FETCH ERROR:", err);
-      alert("Network error");
-    }
-    setLoading(false);
-  };
-
   const handleCheckout = async () => {
-    try {
-      localStorage.setItem("idea", idea);
-      const res = await fetch(
-        "https://novel-backend-1-93dx.onrender.com/create-checkout-session",
-        { method: "POST" }
-      );
-      const data = await res.json();
-      window.location.href = data.url;
-    } catch (err) {
-      console.error(err);
-      alert("Payment failed to start");
-    }
-  };
+  try {
+    // save idea for later
+    localStorage.setItem("idea", idea);
+
+    const res = await fetch(
+      "https://novel-backend-1-93dx.onrender.com/create-checkout-session",
+      {
+        method: "POST"
+      }
+    );
+
+    const data = await res.json();
+
+    // 🔥 redirect to Stripe
+    window.location.href = data.url;
+
+  } catch (err) {
+    console.error(err);
+    alert("Payment failed to start");
+  }
+};
+
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
@@ -127,12 +99,9 @@ const Novel = () => {
             >
               {loading ? "Generating..." : "Generate Story"}
             </button>
-            <button
-              onClick={handleCheckout}
-              className="mt-3 ml-3 px-6 py-2 bg-green-600 text-white rounded"
-            >
-              Buy Now
-            </button>
+            <button onClick={handleCheckout}>
+            Generate Book
+           </button>
           </div>
           
           <div id="novel-content" className="glass-card p-6">
